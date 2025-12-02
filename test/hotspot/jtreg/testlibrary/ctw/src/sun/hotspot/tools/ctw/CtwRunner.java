@@ -309,6 +309,10 @@ public class CtwRunner {
                 "-XX:PerMethodSpecTrapLimit=0",
                 // Artificially expand the scope of inlining in the absence of reasonable profile.
                 "-XX:+InlineColdMethods",
+                // Expand the scope of inlining
+                // TODO: Yank before integration. Currently useful to see what tests are failing.
+                "-XX:MaxInlineSize=70",
+                "-XX:C1MaxInlineSize=70",
                 // Do not pay extra stack trace generation cost for normally thrown exceptions
                 "-XX:-StackTraceInThrowable",
                 "-XX:+IgnoreUnrecognizedVMOptions",
