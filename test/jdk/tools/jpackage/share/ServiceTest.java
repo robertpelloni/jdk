@@ -108,7 +108,7 @@ public class ServiceTest {
     }
 
     @Test
-    public void test() throws Throwable {
+    public void test() {
         var pkg = createPackageTest().addHelloAppInitializer("com.foo.ServiceTest");
         LauncherAsServiceVerifier.build().setExpectedValue("A1").applyTo(pkg);
         createTestInitializer().applyTo(pkg);
@@ -116,7 +116,7 @@ public class ServiceTest {
     }
 
     @Test
-    public void testUpdate() throws Throwable {
+    public void testUpdate() {
         var testInitializer = createTestInitializer().setUpgradeCode(
                 "4050AD4D-D6CC-452A-9CB0-58E5FA8C410F");
 
