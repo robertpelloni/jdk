@@ -631,8 +631,14 @@ public class JavaTokenizer extends UnicodeReader {
      * Determines if the sequence in the literal buffer is a token (keyword, operator.)
      */
     private void checkIdent() {
-        name = names.fromString(sb.toString());
-        tk = tokens.lookupKind(name);
+        String s = sb.toString();
+        if (s.equals("struct")) {
+            name = names.fromString("class");
+            tk = TokenKind.CLASS;
+        } else {
+            name = names.fromString(s);
+            tk = tokens.lookupKind(name);
+        }
     }
 
     /**
