@@ -632,12 +632,22 @@ public class JavaTokenizer extends UnicodeReader {
      */
     private void checkIdent() {
         String s = sb.toString();
-        if (s.equals("struct")) {
-            name = names.fromString("class");
-            tk = TokenKind.CLASS;
-        } else {
-            name = names.fromString(s);
-            tk = tokens.lookupKind(name);
+        switch (s) {
+            case "struct":
+                name = names.fromString("class");
+                tk = TokenKind.CLASS;
+                break;
+            case "const":
+                name = names.fromString("final");
+                tk = TokenKind.FINAL;
+                break;
+            case "bool":
+                name = names.fromString("boolean");
+                tk = TokenKind.BOOLEAN;
+                break;
+            default:
+                name = names.fromString(s);
+                tk = tokens.lookupKind(name);
         }
     }
 
