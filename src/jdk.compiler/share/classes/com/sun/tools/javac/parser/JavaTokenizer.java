@@ -25,6 +25,7 @@
 
 package com.sun.tools.javac.parser;
 
+// PoC: C++ support enabled
 import com.sun.tools.javac.code.Preview;
 import com.sun.tools.javac.code.Source;
 import com.sun.tools.javac.code.Source.Feature;
@@ -630,8 +631,14 @@ public class JavaTokenizer extends UnicodeReader {
      * Determines if the sequence in the literal buffer is a token (keyword, operator.)
      */
     private void checkIdent() {
-        name = names.fromString(sb.toString());
-        tk = tokens.lookupKind(name);
+        String s = sb.toString();
+        if (s.equals("struct")) {
+            name = names.fromString("class");
+            tk = TokenKind.CLASS;
+        } else {
+            name = names.fromString(s);
+            tk = tokens.lookupKind(name);
+        }
     }
 
     /**
@@ -888,6 +895,9 @@ public class JavaTokenizer extends UnicodeReader {
                     tk = TokenKind.RBRACE;
                     break loop;
 
+                case '#':
+                    skipToEOLN();
+                    break;
                 case '/':
                     next();
 

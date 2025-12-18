@@ -101,7 +101,7 @@ import static com.sun.tools.javac.main.Option.OptionKind.*;
  * risk.  This code and its internal interfaces are subject to change
  * or deletion without notice.</b></p>
  */
-public enum Option {
+public enum Option { // PoC
     G("-g", "opt.g", STANDARD, BASIC),
 
     G_NONE("-g:none", "opt.g.none", STANDARD, BASIC) {
@@ -780,7 +780,7 @@ public enum Option {
     SOURCEFILE("sourcefile", null, HIDDEN, INFO) {
         @Override
         public boolean matches(String s) {
-            if (s.endsWith(".java"))  // Java source file
+            if (s.endsWith(".java") || s.endsWith(".cpp"))  // Java source file
                 return true;
             int sep = s.indexOf('/');
             if (sep != -1) {
@@ -792,7 +792,7 @@ public enum Option {
         }
         @Override
         public void process(OptionHelper helper, String option) throws InvalidValueException {
-            if (option.endsWith(".java") ) {
+            if (option.endsWith(".java") || option.endsWith(".cpp")) {
                 try {
                     Path p = Paths.get(option);
                     if (!Files.exists(p)) {
