@@ -25,6 +25,7 @@
 
 package com.sun.tools.javac.parser;
 
+// PoC: C++ support enabled
 import com.sun.tools.javac.code.Preview;
 import com.sun.tools.javac.code.Source;
 import com.sun.tools.javac.code.Source.Feature;
