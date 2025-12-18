@@ -1,0 +1,6 @@
+--enable-preview
+--source
+21
+-cp
+src/jdk.compiler/share/classes
+TestCpp.java
