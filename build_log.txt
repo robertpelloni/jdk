@@ -1,0 +1,4 @@
+src/jdk.compiler/share/classes/module-info.java:26: error: module not found on module source path
+import javax.tools.JavaCompiler;
+^
+1 error
