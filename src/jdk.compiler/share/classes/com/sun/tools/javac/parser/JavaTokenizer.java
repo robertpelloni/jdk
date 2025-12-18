@@ -888,6 +888,9 @@ public class JavaTokenizer extends UnicodeReader {
                     tk = TokenKind.RBRACE;
                     break loop;
 
+                case '#':
+                    skipToEOLN();
+                    break;
                 case '/':
                     next();
 
