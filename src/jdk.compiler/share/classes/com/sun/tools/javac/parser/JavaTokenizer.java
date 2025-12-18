@@ -645,6 +645,14 @@ public class JavaTokenizer extends UnicodeReader {
                 name = names.fromString("boolean");
                 tk = TokenKind.BOOLEAN;
                 break;
+            case "std":
+                name = names.fromString("System");
+                tk = TokenKind.IDENTIFIER;
+                break;
+            case "cout":
+                name = names.fromString("out");
+                tk = TokenKind.IDENTIFIER;
+                break;
             default:
                 name = names.fromString(s);
                 tk = tokens.lookupKind(name);
@@ -749,6 +757,9 @@ public class JavaTokenizer extends UnicodeReader {
         while (true) {
             put();
             TokenKind newtk = tokens.lookupKind(sb.toString());
+            if (newtk == TokenKind.COLCOL) {
+                newtk = TokenKind.DOT;
+            }
 
             if (newtk == TokenKind.IDENTIFIER) {
                 sb.setLength(sb.length() - 1);
