@@ -101,7 +101,7 @@ import static com.sun.tools.javac.main.Option.OptionKind.*;
  * risk.  This code and its internal interfaces are subject to change
  * or deletion without notice.</b></p>
  */
-public enum Option { // PoC
+public enum Option {
     G("-g", "opt.g", STANDARD, BASIC),
 
     G_NONE("-g:none", "opt.g.none", STANDARD, BASIC) {
