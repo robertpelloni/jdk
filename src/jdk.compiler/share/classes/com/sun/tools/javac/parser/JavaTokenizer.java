@@ -825,6 +825,7 @@ public class JavaTokenizer extends UnicodeReader {
                 case 'z':
                 case '$': case '_': // (Spec. 3.8)
                     scanIdent();
+                    if (name.contentEquals("unsigned")) continue loop;
                     break loop;
 
                 case '0': // (Spec. 3.10)
