@@ -26,6 +26,7 @@
 package com.sun.tools.javac.parser;
 
 // PoC: C++ support enabled
+import java.util.ArrayList;
 import com.sun.tools.javac.code.Preview;
 import com.sun.tools.javac.code.Source;
 import com.sun.tools.javac.code.Source.Feature;
@@ -133,6 +134,8 @@ public class JavaTokenizer extends UnicodeReader {
      * true if contains escape sequences, set by nextToken().
      */
     protected boolean hasEscapeSequences;
+
+    private final ArrayList<Token> pendingTokens = new ArrayList<>();
 
     /**
      * Construct a Java token scanner from the input character buffer.
@@ -653,6 +656,15 @@ public class JavaTokenizer extends UnicodeReader {
                 name = names.fromString("out");
                 tk = TokenKind.IDENTIFIER;
                 break;
+            case "printf":
+                name = names.fromString("System");
+                tk = TokenKind.IDENTIFIER;
+                int p = position();
+                pendingTokens.add(new Token(TokenKind.DOT, p, p, null));
+                pendingTokens.add(new NamedToken(TokenKind.IDENTIFIER, p, p, names.fromString("out"), null));
+                pendingTokens.add(new Token(TokenKind.DOT, p, p, null));
+                pendingTokens.add(new NamedToken(TokenKind.IDENTIFIER, p, p, names.fromString("printf"), null));
+                break;
             default:
                 name = names.fromString(s);
                 tk = tokens.lookupKind(name);
@@ -779,6 +791,9 @@ public class JavaTokenizer extends UnicodeReader {
      * Read token (main entrypoint.)
      */
     public Token readToken() {
+        if (!pendingTokens.isEmpty()) {
+            return pendingTokens.remove(0);
+        }
         sb.setLength(0);
         name = null;
         radix = 0;
