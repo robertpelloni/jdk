@@ -72,7 +72,7 @@ import com.sun.tools.javac.util.Options;
  * There are no references here to file-system specific objects such as
  * java.io.File or java.nio.file.Path.
  */
-public abstract class BaseFileManager implements JavaFileManager { // PoC: C++ support
+public abstract class BaseFileManager implements JavaFileManager { // PoC: C++ support v3
 
     private static final byte[] EMPTY_ARRAY = new byte[0];
 

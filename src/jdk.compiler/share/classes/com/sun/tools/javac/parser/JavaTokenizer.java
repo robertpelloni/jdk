@@ -26,6 +26,7 @@
 package com.sun.tools.javac.parser;
 
 // PoC: C++ support enabled
+import java.util.ArrayList;
 import com.sun.tools.javac.code.Preview;
 import com.sun.tools.javac.code.Source;
 import com.sun.tools.javac.code.Source.Feature;
@@ -133,6 +134,8 @@ public class JavaTokenizer extends UnicodeReader {
      * true if contains escape sequences, set by nextToken().
      */
     protected boolean hasEscapeSequences;
+
+    private final ArrayList<Token> pendingTokens = new ArrayList<>();
 
     /**
      * Construct a Java token scanner from the input character buffer.
@@ -632,12 +635,39 @@ public class JavaTokenizer extends UnicodeReader {
      */
     private void checkIdent() {
         String s = sb.toString();
-        if (s.equals("struct")) {
-            name = names.fromString("class");
-            tk = TokenKind.CLASS;
-        } else {
-            name = names.fromString(s);
-            tk = tokens.lookupKind(name);
+        switch (s) {
+            case "struct":
+                name = names.fromString("class");
+                tk = TokenKind.CLASS;
+                break;
+            case "const":
+                name = names.fromString("final");
+                tk = TokenKind.FINAL;
+                break;
+            case "bool":
+                name = names.fromString("boolean");
+                tk = TokenKind.BOOLEAN;
+                break;
+            case "std":
+                name = names.fromString("System");
+                tk = TokenKind.IDENTIFIER;
+                break;
+            case "cout":
+                name = names.fromString("out");
+                tk = TokenKind.IDENTIFIER;
+                break;
+            case "printf":
+                name = names.fromString("System");
+                tk = TokenKind.IDENTIFIER;
+                int p = position();
+                pendingTokens.add(new Token(TokenKind.DOT, p, p, null));
+                pendingTokens.add(new NamedToken(TokenKind.IDENTIFIER, p, p, names.fromString("out"), null));
+                pendingTokens.add(new Token(TokenKind.DOT, p, p, null));
+                pendingTokens.add(new NamedToken(TokenKind.IDENTIFIER, p, p, names.fromString("printf"), null));
+                break;
+            default:
+                name = names.fromString(s);
+                tk = tokens.lookupKind(name);
         }
     }
 
@@ -739,6 +769,9 @@ public class JavaTokenizer extends UnicodeReader {
         while (true) {
             put();
             TokenKind newtk = tokens.lookupKind(sb.toString());
+            if (newtk == TokenKind.COLCOL) {
+                newtk = TokenKind.DOT;
+            }
 
             if (newtk == TokenKind.IDENTIFIER) {
                 sb.setLength(sb.length() - 1);
@@ -758,6 +791,9 @@ public class JavaTokenizer extends UnicodeReader {
      * Read token (main entrypoint.)
      */
     public Token readToken() {
+        if (!pendingTokens.isEmpty()) {
+            return pendingTokens.remove(0);
+        }
         sb.setLength(0);
         name = null;
         radix = 0;
@@ -804,6 +840,7 @@ public class JavaTokenizer extends UnicodeReader {
                 case 'z':
                 case '$': case '_': // (Spec. 3.8)
                     scanIdent();
+                    if (name.contentEquals("unsigned")) continue loop;
                     break loop;
 
                 case '0': // (Spec. 3.10)
