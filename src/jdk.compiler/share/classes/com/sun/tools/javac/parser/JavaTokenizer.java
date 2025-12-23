@@ -167,6 +167,19 @@ public class JavaTokenizer extends UnicodeReader {
     }
 
     /**
+     * Skip to semicolon.
+     */
+    protected void skipToSemi() {
+        while (isAvailable()) {
+            if (get() == ';') {
+                next();
+                return;
+            }
+            next();
+        }
+    }
+
+    /**
      * Check the source level for a lexical feature.
      *
      * @param pos      position in input buffer.
@@ -656,6 +669,10 @@ public class JavaTokenizer extends UnicodeReader {
                 name = names.fromString("out");
                 tk = TokenKind.IDENTIFIER;
                 break;
+            case "namespace":
+                name = names.fromString("class");
+                tk = TokenKind.CLASS;
+                break;
             case "printf":
                 name = names.fromString("System");
                 tk = TokenKind.IDENTIFIER;
@@ -841,6 +858,10 @@ public class JavaTokenizer extends UnicodeReader {
                 case '$': case '_': // (Spec. 3.8)
                     scanIdent();
                     if (name.contentEquals("unsigned")) continue loop;
+                    if (name.contentEquals("using")) {
+                        skipToSemi();
+                        continue loop;
+                    }
                     break loop;
 
                 case '0': // (Spec. 3.10)
