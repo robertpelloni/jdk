@@ -56,6 +56,7 @@ class SerializeClosure;
   template(java_base,                                 "java.base")                                \
   template(java_lang_System,                          "java/lang/System")                         \
   template(java_lang_Object,                          "java/lang/Object")                         \
+  template(org_jvmcpp_runtime_ManagedPointer,         "org/jvmcpp/runtime/ManagedPointer")        \
   template(java_lang_Class,                           "java/lang/Class")                          \
   template(java_lang_Module,                          "java/lang/Module")                         \
   template(java_lang_String,                          "java/lang/String")                         \

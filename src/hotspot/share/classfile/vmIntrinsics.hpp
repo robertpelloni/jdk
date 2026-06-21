@@ -118,6 +118,8 @@ class methodHandle;
   do_intrinsic(_notifyAll,                java_lang_Object,       notifyAll_name, void_method_signature,         F_RN)  \
    do_name(     notifyAll_name,                                  "notifyAll")                                           \
                                                                                                                         \
+  do_class(org_jvmcpp_runtime_ManagedPointer, "org/jvmcpp/runtime/ManagedPointer")                                      \
+                                                                                                                        \
   /* Math & StrictMath intrinsics are defined in terms of just a few signatures: */                                     \
   do_class(java_lang_Math,                "java/lang/Math")                                                             \
   do_class(java_lang_StrictMath,          "java/lang/StrictMath")                                                       \

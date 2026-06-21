@@ -4520,7 +4520,20 @@ void ConnectionGraph::split_unique_types(GrowableArray<Node *>  &alloc_worklist,
       if (t == nullptr) {
         continue;  // not a TypeOopPtr
       }
-      if (!t->klass_is_exact()) {
+
+      bool is_managed_pointer = false;
+      if (alloc->is_Allocate()) {
+        const Type* ktype = igvn->type(alloc->in(AllocateNode::KlassNode));
+        if (ktype->isa_instklassptr() != nullptr) {
+          const TypeInstKlassPtr* ikt = ktype->is_instklassptr();
+          ciInstanceKlass* ik = ikt->instance_klass();
+          if (ik != nullptr && ik->name() == vmSymbols::org_jvmcpp_runtime_ManagedPointer()) {
+            is_managed_pointer = true;
+          }
+        }
+      }
+
+      if (!t->klass_is_exact() && !is_managed_pointer) {
         continue; // not an unique type
       }
       if (alloc->is_Allocate()) {
