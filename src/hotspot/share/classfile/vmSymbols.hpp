@@ -56,7 +56,6 @@ class SerializeClosure;
   template(java_base,                                 "java.base")                                \
   template(java_lang_System,                          "java/lang/System")                         \
   template(java_lang_Object,                          "java/lang/Object")                         \
-  template(org_jvmcpp_runtime_ManagedPointer,         "org/jvmcpp/runtime/ManagedPointer")        \
   template(java_lang_Class,                           "java/lang/Class")                          \
   template(java_lang_Module,                          "java/lang/Module")                         \
   template(java_lang_String,                          "java/lang/String")                         \
@@ -73,6 +72,7 @@ class SerializeClosure;
   template(java_lang_Throwable,                       "java/lang/Throwable")                      \
   template(java_lang_ClassLoader,                     "java/lang/ClassLoader")                    \
   template(java_lang_Runnable,                        "java/lang/Runnable")                       \
+  template(org_jvmcpp_runtime_ManagedPointer,         "org/jvmcpp/runtime/ManagedPointer")       \
   template(jdk_internal_vm_ContinuationScope,         "jdk/internal/vm/ContinuationScope")        \
   template(jdk_internal_vm_StackChunk,                "jdk/internal/vm/StackChunk")               \
   template(java_lang_Boolean,                         "java/lang/Boolean")                        \
@@ -447,6 +447,8 @@ class SerializeClosure;
   template(profile_name,                              "profile")                                  \
   template(equals_name,                               "equals")                                   \
   template(length_name,                               "length")                                   \
+  template(get_name,                                  "get")                                      \
+  template(set_name,                                  "set")                                      \
   template(target_name,                               "target")                                   \
   template(toString_name,                             "toString")                                 \
   template(values_name,                               "values")                                   \

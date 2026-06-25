@@ -4522,14 +4522,10 @@ void ConnectionGraph::split_unique_types(GrowableArray<Node *>  &alloc_worklist,
       }
 
       bool is_managed_pointer = false;
-      if (alloc->is_Allocate()) {
-        const Type* ktype = igvn->type(alloc->in(AllocateNode::KlassNode));
-        if (ktype->isa_instklassptr() != nullptr) {
-          const TypeInstKlassPtr* ikt = ktype->is_instklassptr();
-          ciInstanceKlass* ik = ikt->instance_klass();
-          if (ik != nullptr && ik->name() == vmSymbols::org_jvmcpp_runtime_ManagedPointer()) {
-            is_managed_pointer = true;
-          }
+      if (t->isa_instptr() && t->is_instptr()->instance_klass() != nullptr) {
+        ciInstanceKlass* ik = t->is_instptr()->instance_klass();
+        if (ik->name() != nullptr && ik->name()->get_symbol() == vmSymbols::org_jvmcpp_runtime_ManagedPointer()) {
+          is_managed_pointer = true;
         }
       }
 
@@ -4540,6 +4536,13 @@ void ConnectionGraph::split_unique_types(GrowableArray<Node *>  &alloc_worklist,
         // Set the scalar_replaceable flag for allocation
         // so it could be eliminated.
         alloc->as_Allocate()->_is_scalar_replaceable = true;
+      }
+
+      if (is_managed_pointer && !t->klass_is_exact()) {
+         // ManagedPointer optimizations
+         // Since it's a known class we can force it exact to allow scalar replacement.
+         t = t->cast_to_exactness(true)->is_oopptr();
+         igvn->set_type(n, t); // Important: update type in IGVN
       }
       set_escape_state(ptnode_adr(n->_idx), es NOT_PRODUCT(COMMA trace_propagate_message(ptn))); // CheckCastPP escape state
       // in order for an object to be scalar-replaceable, it must be:

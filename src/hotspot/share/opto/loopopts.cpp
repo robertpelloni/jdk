@@ -1513,7 +1513,7 @@ void PhaseIdealLoop::split_if_with_blocks_post(Node *n) {
     Node *bol = n->in(1);
     uint max = bol->outcnt();
     // Check for same test used more than once?
-    if (bol->is_Bool() && (max > 1 || bol->in(1)->is_SubTypeCheck() || n_op == Op_RangeCheck)) {
+    if (bol->is_Bool() && (max > 1 || bol->in(1)->is_SubTypeCheck())) {
       // Search up IDOMs to see if this IF is dominated.
       Node* cmp = bol->in(1);
       Node *cutoff = cmp->is_SubTypeCheck() ? dom_lca(get_ctrl(cmp->in(1)), get_ctrl(cmp->in(2))) : get_ctrl(bol);
