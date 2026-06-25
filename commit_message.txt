@@ -1,0 +1,10 @@
+Implement ManagedPointer optimizations
+
+1. Escape Analysis Optimization: Modifies the HotSpot C2 Escape Analysis pipeline
+   to recognize the `org.jvmcpp.runtime.ManagedPointer` class, aggressively applying
+   scalar replacement to flatten its fields.
+2. Loop Invariant Bounds-Check Elimination: Updates the loop optimization phase
+   to detect sequential array accesses using `ManagedPointer` and hoist the
+   internal offset checks.
+3. Intrinsics: Registers these behaviors as C2 compiler intrinsics inside
+   `vmIntrinsics.hpp` and `vmSymbols.hpp`.

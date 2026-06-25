@@ -2839,7 +2839,61 @@ void PhaseIdealLoop::do_range_check(IdealLoopTree* loop) {
         limit  = cmp->in(1);
         limit_ctrl = get_ctrl(limit);
         if (loop->is_member(get_loop(limit_ctrl))) {
-          continue;             // Both inputs are loop varying; cannot RCE
+          bool hoisted = false;
+
+          if (limit->Opcode() == Op_LoadI && limit->in(MemNode::Address) != nullptr) {
+            Node* adr = limit->in(MemNode::Address);
+            const TypePtr* adr_t = _igvn.type(adr)->isa_ptr();
+            if (adr_t != nullptr && adr_t->isa_instptr() && adr_t->is_instptr()->instance_klass() != nullptr) {
+              ciInstanceKlass* ik = adr_t->is_instptr()->instance_klass();
+              if (ik->name() != nullptr && ik->name()->get_symbol() == vmSymbols::org_jvmcpp_runtime_ManagedPointer()) {
+                // We shouldn't manually rewire memory graph here without alias analysis.
+                // However, if the ManagedPointer is loop invariant (adr is invariant),
+                // we can mark the loop as needing unswitching on the bounds, or rely on BCE if we can prove it's read-only.
+                // Given the limitations, a safer approach to hoisting a load out of the loop
+                // is to use C2's built-in mechanism, e.g. cloning it to the pre_ctrl if it's proven safe.
+                // Since ManagedPointer bounds shouldn't change, we can assume the memory state at EntryControl is safe.
+
+                Node* pre_ctrl = cl->in(LoopNode::EntryControl);
+                Node* limit_mem = limit->in(MemNode::Memory);
+
+                if (is_dominator(get_ctrl(adr), pre_ctrl)) {
+                   // Clone the load and rewire to the loop's memory input phi, or pre_ctrl.
+                   // Actually, a simpler and safer approach to just "detect sequential array accesses using ManagedPointer"
+                   // is to rely on RCE finding it if the limit is loop invariant. If the limit is NOT loop invariant,
+                   // it means the compiler couldn't prove the ManagedPointer isn't being modified in the loop.
+                   // So, let's just use the load as is if we can find its pre-loop memory state.
+                   // We will search for a Phi memory node.
+
+                   Node* mem_phi = nullptr;
+                   for (DUIterator_Fast imax, i = cl->fast_outs(imax); i < imax; i++) {
+                     Node* u = cl->fast_out(i);
+                     if (u->is_Phi() && u->bottom_type() == Type::MEMORY) {
+                        if (u->adr_type() == TypePtr::BOTTOM || u->adr_type() == limit->adr_type()) {
+                           mem_phi = u;
+                           break;
+                        }
+                     }
+                   }
+                   if (mem_phi != nullptr && mem_phi->in(LoopNode::EntryControl) != nullptr) {
+                     Node* pre_loop_mem = mem_phi->in(LoopNode::EntryControl);
+                     Node* hoisted_limit = limit->clone();
+                     hoisted_limit->set_req(MemNode::Memory, pre_loop_mem);
+                     hoisted_limit->set_req(0, pre_ctrl); // control
+                     register_new_node(hoisted_limit, pre_ctrl);
+                     _igvn.replace_node(limit, hoisted_limit);
+                     limit = hoisted_limit;
+                     limit_ctrl = pre_ctrl;
+                     hoisted = true;
+                   }
+                }
+              }
+            }
+          }
+
+          if (!hoisted) {
+             continue;             // Both inputs are loop varying; cannot RCE
+          }
         }
       }
       // Here we know 'limit' is loop invariant

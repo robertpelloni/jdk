@@ -724,6 +724,9 @@ class methodHandle;
   /* special marker for blackholed methods: */                                                                          \
   do_intrinsic(_blackhole,                java_lang_Object,       blackhole_name, star_name, F_S)                       \
                                                                                                                         \
+  do_intrinsic(_ManagedPointer_get,       org_jvmcpp_runtime_ManagedPointer, get_name, star_name, F_RN)                 \
+  do_intrinsic(_ManagedPointer_set,       org_jvmcpp_runtime_ManagedPointer, set_name, star_name, F_RN)                 \
+                                                                                                                        \
   /* unsafe memory references (there are a lot of them...) */                                                           \
   do_signature(getReference_signature,    "(Ljava/lang/Object;J)Ljava/lang/Object;")                                    \
   do_signature(putReference_signature,    "(Ljava/lang/Object;JLjava/lang/Object;)V")                                   \
